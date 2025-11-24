@@ -1,6 +1,6 @@
-Nama : Rima Dwi Puspitasari
-NPM : 2315061038
-Kelas PW-D
+- Nama : Rima Dwi Puspitasari
+- NPM : 2315061038
+- Kelas PW-B
 
 ---
 
@@ -36,7 +36,7 @@ Rima Calculator adalah aplikasi kalkulator berbasis web dengan tampilan modern d
 ## 📸 Tampilan Aplikasi
 
 ### 🟣 Halaman Utama
-![Tampilan Utama](Tampilan.PNG)
+![Tampilan Utama](Tampilan.png)
 
 ### 🟡 Halaman History
-![History](History.PNG)
+![History](History.png)
