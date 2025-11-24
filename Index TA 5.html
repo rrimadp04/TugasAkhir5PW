@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Rima Calculator</title>
+<style>
+
+:root {
+  --bg1: #fff3f6;
+  --bg2: #ffeef4;
+  --card: #ffffff;
+  --text: #2b1b20;
+  --muted: #7b6b74;
+  --yellow: #ffdd57;
+  --softpink: #f7d7df;
+  --pink: #f3cbd3;
+  --pink-dark: #f0b0bf;
+  --gray: #dcdcdc;
+  --shadow: 0 8px 24px rgba(43, 27, 32, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, Arial;
+  color: var(--text);
+  padding: 18px;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.hist-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  text-align: center;
+}
+
+.history-icon {
+  width: auto;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  padding: 0 8px;
+}
+
+.history-label {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.display {
+  background: #fff;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  min-height: 86px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.expr {
+  color: var(--muted);
+  font-size: 13px;
+  min-height: 18px;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 6px;
+}
+
+.main {
+  font-size: 32px;
+  font-weight: 700;
+  word-break: break-all;
+  padding-right: 6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.btn {
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  background: var(--pink);
+  color: var(--text);
+  transition: transform 0.1s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-op {
+  background: var(--pink-dark);
+}
+
+.btn-num {
+  background: var(--softpink);
+}
+
+.btn-mem {
+  background: var(--gray);
+}
+
+.btn-imp {
+  background: var(--yellow);
+}
+
+.big {
+  grid-column: span 2;
+}
+
+.history-box {
+  position: absolute;
+  top: 60px;
+  right: 12px;
+  width: 220px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  max-height: 220px;
+  overflow: auto;
+  transform: translateY(-6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.18s ease;
+}
+
+.history-box.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hist-item {
+  padding: 8px;
+  border-radius: 8px;
+  color: #4a3a41;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  background: linear-gradient(180deg, #fff, #fffaf2);
+}
+
+.hist-item:hover {
+  background: linear-gradient(180deg, #fffaf2, #fff3e6);
+}
+
+.empty-hist {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .main {
+    font-size: 28px;
+  }
+  
+  .history-box {
+    right: 8px;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="container" role="application" aria-label="Kalkulator Interaktif">
+    <!-- Header -->
+    <div class="header">
+      <div class="title">Rima Calculator</div>
+      
+      <div class="header-right">
+        <!-- Memory Display -->
+        <div id="memoryDisplay" title="Nilai Memori">
+          <div style="font-size: 13px; color: var(--muted); border: 1px solid var(--gray); padding: 6px 10px; border-radius: 6px;">Memory: <span id="memoryValue">0</span></div>
+        </div>
+        <!-- History Toggle -->
+        <div id="histToggle" class="hist-container" aria-haspopup="true" aria-expanded="false">
+          <div class="history-icon" title="History">⟳</div>
+          <div class="history-label">History</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Display -->
+    <div class="display" aria-live="polite">
+      <div class="expr" id="expr">&nbsp;</div>
+      <div class="main" id="main">0</div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="grid" id="buttons" aria-label="Tombol Kalkulator">
+      <!-- Memory Buttons -->
+      <button class="btn btn-mem" data-action="mc">MC</button>
+      <button class="btn btn-mem" data-action="mr">MR</button>
+      <button class="btn btn-mem" data-action="mplus">M+</button>
+      <button class="btn btn-mem" data-action="mminus">M-</button>
+
+      <!-- Clear & Operation Buttons -->
+      <button class="btn btn-imp" data-action="ce">CE</button>
+      <button class="btn btn-imp" data-action="c">C</button>
+      <button class="btn btn-imp" data-action="back">⌫</button>
+      <button class="btn btn-op" data-action="div">÷</button>
+
+      <!-- Number Pad -->
+      <button class="btn btn-num" data-num="7">7</button>
+      <button class="btn btn-num" data-num="8">8</button>
+      <button class="btn btn-num" data-num="9">9</button>
+      <button class="btn btn-op" data-action="mul">×</button>
+
+      <button class="btn btn-num" data-num="4">4</button>
+      <button class="btn btn-num" data-num="5">5</button>
+      <button class="btn btn-num" data-num="6">6</button>
+      <button class="btn btn-op" data-action="sub">−</button>
+
+      <button class="btn btn-num" data-num="1">1</button>
+      <button class="btn btn-num" data-num="2">2</button>
+      <button class="btn btn-num" data-num="3">3</button>
+      <button class="btn btn-op" data-action="add">+</button>
+
+      <button class="btn btn-num big" data-num="0">0</button>
+      <button class="btn btn-num" data-action="dot">.</button>
+      <button class="btn btn-imp" data-action="equals">=</button>
+    </div>
+
+    <!-- History Box -->
+    <div class="history-box" id="historyBox" aria-hidden="true"></div>
+  </div>
+
+<script>
+(function() {
+  'use strict';
+
+  const elements = {
+    expr: document.getElementById('expr'),
+    main: document.getElementById('main'),
+    histBox: document.getElementById('historyBox'),
+    histToggle: document.getElementById('histToggle'),
+    memoryValue: document.getElementById('memoryValue'),
+    buttons: document.getElementById('buttons')
+  };
+
+  const state = {
+    displayExpr: '',  
+    evalExpr: '',     
+    current: '',      
+    memory: 0,        
+    history: [],      
+    MAX_HISTORY: 5
+  };
+
+  function renderMemory() {
+    const memStr = Number.isInteger(state.memory) 
+      ? String(state.memory) 
+      : String(parseFloat(state.memory.toPrecision(12)));
+    elements.memoryValue.textContent = memStr;
+  }
+
+  function renderDisplay() {
+    elements.expr.textContent = state.displayExpr || '\u00A0';
+    
+    if (state.current !== '') {
+      elements.main.textContent = state.current;
+    } else if (state.evalExpr && /[+\-*/]$/.test(state.evalExpr)) {
+      elements.main.textContent = '0';
+    } else {
+      elements.main.textContent = state.evalExpr ? previewEval(state.evalExpr) : '0';
+    }
+  }
+
+  function renderHistory() {
+    if (!state.history.length) {
+      elements.histBox.innerHTML = '<div class="empty-hist">Kosong</div>';
+      return;
+    }
+
+    elements.histBox.innerHTML = state.history
+      .map(h => `<div class="hist-item" data-entry="${escapeHtml(h)}">${escapeHtml(h)}</div>`)
+      .join('');
+
+    elements.histBox.querySelectorAll('.hist-item').forEach(el => {
+      el.onclick = () => handleHistoryClick(el.getAttribute('data-entry'));
+    });
+  }
+
+  function renderAll() {
+    renderDisplay();
+    renderMemory();
+    renderHistory();
+  }
+
+  function previewEval(jsExpr) {
+    try {
+      const value = Function('"use strict";return (' + jsExpr + ')')();
+      if (!isFinite(value)) return 'Error';
+      return Number.isInteger(value) 
+        ? String(value) 
+        : String(parseFloat(value.toPrecision(12)));
+    } catch {
+      return '0';
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function sanitize(str) {
+    if (/[^0-9+\-*/().% ]/.test(str)) return null;
+    return str;
+  }
+
+  // ========== Calculator Functions ==========
+  function appendNumber(num) {
+    if (state.current === 'Error') {
+      state.current = '';
+      state.displayExpr = '';
+      state.evalExpr = '';
+    }
+
+    if (num === '.' && state.current.includes('.')) return;
+
+    if (state.current === '0' && num !== '.') {
+      state.current = num;
+    } else {
+      state.current += num;
+    }
+
+    state.displayExpr += num;
+    state.evalExpr += num;
+    renderAll();
+  }
+
+  function appendOperator(opDisplay, opEval) {
+    if (state.current === '' && state.evalExpr === '') {
+      if (opEval === '-') {
+        state.current = '−';
+        state.displayExpr = '−';
+        state.evalExpr = '-';
+        renderAll();
+      }
+      return;
+    }
+
+    if (/[+\-*/]$/.test(state.evalExpr)) {
+      state.displayExpr = state.displayExpr.replace(/[+\-×÷]\s*$/, '') + opDisplay;
+      state.evalExpr = state.evalExpr.slice(0, -1) + opEval;
+    } else {
+      state.displayExpr += opDisplay;
+      state.evalExpr += opEval;
+    }
+
+    state.current = '';
+    renderAll();
+  }
+
+  function clearAll() {
+    state.displayExpr = '';
+    state.evalExpr = '';
+    state.current = '';
+    renderAll();
+  }
+
+  function clearEntry() {
+    if (!state.current) return;
+
+    state.displayExpr = state.displayExpr.slice(0, -state.current.length);
+    state.evalExpr = state.evalExpr.slice(0, -state.current.length);
+    state.current = '';
+    renderAll();
+  }
+
+  function backspace() {
+    if (state.current.length > 0) {
+      state.current = state.current.slice(0, -1);
+      state.displayExpr = state.displayExpr.slice(0, -1);
+      state.evalExpr = state.evalExpr.slice(0, -1);
+      renderAll();
+      return;
+    }
+
+    if (state.evalExpr.length > 0) {
+      state.evalExpr = state.evalExpr.slice(0, -1);
+      state.displayExpr = state.displayExpr.slice(0, -1);
+      renderAll();
+    }
+  }
+
+  function calculate() {
+    const jsExpr = state.evalExpr.trim();
+    if (!jsExpr) return;
+
+    const safeExpr = jsExpr.replace(/(\d+(\.\d+)?)%/g, '($1/100)');
+    if (sanitize(safeExpr) === null) {
+      elements.main.textContent = 'Error';
+      state.displayExpr = '';
+      state.evalExpr = '';
+      state.current = '';
+      return;
+    }
+
+    try {
+      const result = Function('"use strict";return (' + safeExpr + ')')();
+      
+      if (!isFinite(result) || Number.isNaN(result)) {
+        throw new Error('Math error');
+      }
+
+      const resultStr = Number.isInteger(result) 
+        ? String(result) 
+        : String(parseFloat(result.toPrecision(12)));
+
+      const displayEntry = state.displayExpr.replace(/\*/g, '×').replace(/\//g, '÷');
+      
+      state.history.unshift(displayEntry + ' = ' + resultStr);
+      if (state.history.length > state.MAX_HISTORY) {
+        state.history.pop();
+      }
+
+      state.displayExpr = resultStr;
+      state.evalExpr = resultStr;
+      state.current = resultStr;
+      renderAll();
+    } catch {
+      elements.main.textContent = 'Error';
+      state.displayExpr = '';
+      state.evalExpr = '';
+      state.current = '';
+    }
+  }
+
+  // ========== Memory Functions ==========
+  function memoryClear() {
+    state.memory = 0;
+    renderAll();
+  }
+
+  function memoryRecall() {
+    if (state.memory === 0) return;
+
+    const recallValue = String(state.memory);
+
+    if (state.current.length > 0) {
+      state.displayExpr = state.displayExpr.slice(0, -state.current.length);
+      state.evalExpr = state.evalExpr.slice(0, -state.current.length);
+    }
+
+    state.current = recallValue;
+    state.displayExpr += recallValue;
+    state.evalExpr += recallValue;
+    renderAll();
+  }
+
+  function memoryPlus() {
+    const value = Number(elements.main.textContent);
+    if (isFinite(value)) {
+      state.memory += value;
+    }
+    renderAll();
+  }
+
+  function memoryMinus() {
+    const value = Number(elements.main.textContent);
+    if (isFinite(value)) {
+      state.memory -= value;
+    }
+    renderAll();
+  }
+
+  // ========== History Functions ==========
+  function showHistory() {
+    elements.histBox.classList.add('active');
+    elements.histToggle.setAttribute('aria-expanded', 'true');
+  }
+
+  function hideHistory() {
+    elements.histBox.classList.remove('active');
+    elements.histToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  function toggleHistory() {
+    if (elements.histBox.classList.contains('active')) {
+      hideHistory();
+    } else {
+      renderHistory();
+      showHistory();
+    }
+  }
+
+  function handleHistoryClick(txt) {
+    const parts = txt.split('=');
+    if (parts.length > 1) {
+      const result = parts[1].trim();
+      state.displayExpr = result;
+      state.evalExpr = result.replace(/×/g, '*').replace(/÷/g, '/');
+      state.current = result;
+      hideHistory();
+      renderAll();
+    }
+  }
+
+  function handleButtonClick(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const num = btn.dataset.num;
+    const action = btn.dataset.action;
+
+    if (num !== undefined) {
+      appendNumber(num);
+      return;
+    }
+
+    const actions = {
+      'dot': () => appendNumber('.'),
+      'add': () => appendOperator('+', '+'),
+      'sub': () => appendOperator('−', '-'),
+      'mul': () => appendOperator('×', '*'),
+      'div': () => appendOperator('÷', '/'),
+      'c': clearAll,
+      'ce': clearEntry,
+      'back': backspace,
+      'equals': calculate,
+      'mc': memoryClear,
+      'mr': memoryRecall,
+      'mplus': memoryPlus,
+      'mminus': memoryMinus
+    };
+
+    if (actions[action]) {
+      actions[action]();
+    }
+  }
+
+  function handleKeydown(ev) {
+    const keyActions = {
+      'number': (key) => /^[0-9]$/.test(key) && appendNumber(key),
+      '.': () => appendNumber('.'),
+      'Backspace': backspace,
+      'Delete': clearEntry,
+      'Escape': clearAll,
+      'Enter': calculate,
+      '=': calculate,
+      '+': () => appendOperator('+', '+'),
+      '-': () => appendOperator('−', '-'),
+      '*': () => appendOperator('×', '*'),
+      'x': () => appendOperator('×', '*'),
+      'X': () => appendOperator('×', '*'),
+      '/': () => appendOperator('÷', '/')
+    };
+
+    if (/^[0-9]$/.test(ev.key)) {
+      ev.preventDefault();
+      appendNumber(ev.key);
+      return;
+    }
+
+    if (ev.ctrlKey && ev.key.toLowerCase() === 'm') {
+      ev.preventDefault();
+      if (ev.shiftKey) {
+        memoryClear();
+      } else if (ev.altKey) {
+        memoryPlus();
+      } else {
+        memoryRecall();
+      }
+      return;
+    }
+
+    if (keyActions[ev.key]) {
+      ev.preventDefault();
+      keyActions[ev.key]();
+    }
+  }
+
+  function handleClickOutside(e) {
+    if (!elements.histBox.contains(e.target) && !elements.histToggle.contains(e.target)) {
+      hideHistory();
+    }
+  }
+
+  elements.buttons.addEventListener('click', handleButtonClick);
+  elements.histToggle.addEventListener('click', toggleHistory);
+  document.addEventListener('keydown', handleKeydown);
+  document.addEventListener('click', handleClickOutside);
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
